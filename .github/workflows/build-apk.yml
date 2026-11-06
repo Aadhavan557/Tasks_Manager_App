@@ -33,17 +33,16 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Install Node Dependencies
-        run: npm ci
+        run: npm install
+
+      - name: Grant Execute Permission to Gradle Wrapper
+        run: chmod +x android/gradlew
 
       - name: Build Web Application
         run: npm run build
 
       - name: Sync Capacitor Android
         run: npx cap sync android
-
-      - name: Grant Execute Permission to Gradle Wrapper
-        working-directory: android
-        run: chmod +x gradlew
 
       - name: Build Android Debug APK
         working-directory: android
@@ -53,6 +52,7 @@ jobs:
         run: |
           mkdir -p build-output
           cp android/app/build/outputs/apk/debug/app-debug.apk build-output/DuoMate.apk
+          ls -la build-output/
 
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
@@ -63,7 +63,7 @@ jobs:
 
       - name: Create GitHub Release with APK
         uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/') || github.ref == 'refs/heads/main'
+        continue-on-error: true
         with:
           tag_name: v1.0.${{ github.run_number }}
           name: DuoMate Android App v1.0.${{ github.run_number }}
@@ -76,7 +76,7 @@ jobs:
             ### How to install on your phone:
             1. Download the `DuoMate.apk` file attached below directly onto your Android phone.
             2. Tap on the downloaded file.
-            3. If prompted, allow "Install from unknown sources" in Settings.
+            3. If prompted, allow "Install from unknown sources" in your phone's Settings.
             4. Tap **Install** and launch **DuoMate**!
           files: build-output/DuoMate.apk
         env:
