@@ -1,7 +1,7 @@
 # DuoMate 🚀
 > *"Two Friends. One Goal. Better Every Day."*
 
-A private, modern, production-grade career growth, study management, and mutual accountability web platform built exclusively for **Aadhavan** and **Narmatha**.
+A private, modern, production-grade career growth, study management, and mutual accountability web platform built exclusively for **Aadhavan** and **MY FRD**.
 
 Both users share high-impact ambitions in:
 - **VLSI Design and Verification**
