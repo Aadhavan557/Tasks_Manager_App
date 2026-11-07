@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Sun, Moon, LogOut, Menu, User } from "lucide-react";
+import { Sun, Moon, LogOut, Menu, User, Cloud, RefreshCw } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { getGreeting, getInitials } from "@/lib/utils";
 import { format } from "date-fns";
+import { subscribeCloudSyncStatus, requestFullCloudSync, type CloudSyncStatus } from "@/lib/cloudSync";
+import { toast } from "sonner";
 
 interface HeaderProps {
   onOpenMobileMenu?: () => void;
@@ -16,6 +18,19 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
   const { profile, signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const [showDropdown, setShowDropdown] = useState(false);
+  const [cloudStatus, setCloudStatus] = useState<CloudSyncStatus>("connecting");
+  const [isSyncing, setIsSyncing] = useState(false);
+
+  useEffect(() => {
+    return subscribeCloudSyncStatus(setCloudStatus);
+  }, []);
+
+  const handleManualSync = () => {
+    setIsSyncing(true);
+    requestFullCloudSync();
+    toast.success("Synchronizing across all devices...");
+    setTimeout(() => setIsSyncing(false), 1200);
+  };
 
   if (!profile) return null;
 
@@ -45,6 +60,29 @@ export function Header({ onOpenMobileMenu }: HeaderProps) {
 
       {/* Right Actions */}
       <div className="flex items-center gap-2">
+        {/* Cloud Sync Status Pill */}
+        <button
+          type="button"
+          onClick={handleManualSync}
+          title="Click to force sync across Phone & Laptop"
+          className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-all hover:bg-muted/50 bg-card"
+        >
+          <span
+            className={`w-2 h-2 rounded-full ${
+              cloudStatus === "connected"
+                ? "bg-emerald-500 shadow-sm shadow-emerald-500/50"
+                : cloudStatus === "connecting"
+                ? "bg-amber-500 animate-pulse"
+                : "bg-rose-500"
+            }`}
+          />
+          <Cloud className="h-3 w-3 text-muted-foreground" />
+          <span className="text-muted-foreground">
+            {cloudStatus === "connected" ? "Cloud Synced" : "Connecting..."}
+          </span>
+          <RefreshCw className={`h-2.5 w-2.5 text-muted-foreground ${isSyncing ? "animate-spin" : ""}`} />
+        </button>
+
         {/* Theme toggle */}
         <Button
           variant="ghost"

@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase, isValidSupabaseConfig } from "@/lib/supabase";
+import { broadcastCloudSync } from "@/lib/cloudSync";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
@@ -137,6 +138,8 @@ export function TasksPage() {
     localStorage.setItem("duomate_tasks", JSON.stringify(updated));
     // Broadcast event so Dashboard and other tabs update instantly
     window.dispatchEvent(new Event("duomate_task_updated"));
+    // Realtime Cloud Broadcast to all devices (phone & laptop)
+    broadcastCloudSync("TASKS_SYNC", updated);
   };
 
   const handleCreateTask = async (e: React.FormEvent) => {

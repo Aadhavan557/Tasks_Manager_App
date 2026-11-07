@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { broadcastCloudSync } from "@/lib/cloudSync";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -81,6 +82,7 @@ export function ChatPage() {
 
     const updated = [...messages, newMsg];
     saveMessages(updated);
+    broadcastCloudSync("CHAT_MESSAGE", newMsg);
     setInputText("");
   };
 

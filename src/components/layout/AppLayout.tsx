@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 import { Header } from "./Header";
+import { initCloudSync } from "@/lib/cloudSync";
 
 export function AppLayout() {
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    initCloudSync();
+  }, []);
 
   return (
     <div className="min-h-screen bg-background flex">

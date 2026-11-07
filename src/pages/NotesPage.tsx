@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { broadcastCloudSync } from "@/lib/cloudSync";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -171,8 +172,9 @@ export function NotesPage() {
       setLastEditedAt(now);
       setIsSaving(false);
 
-      // Notify other windows/tabs
+      // Notify other windows/tabs & all devices via cloud
       window.dispatchEvent(new Event("duomate_notes_updated"));
+      broadcastCloudSync("NOTEPAD_SYNC", { text: newText, meta: { by: editorName, at: now } });
     }, 400);
   };
 
@@ -192,6 +194,7 @@ export function NotesPage() {
       setLastEditedBy(editorName);
       setLastEditedAt(now);
       window.dispatchEvent(new Event("duomate_notes_updated"));
+      broadcastCloudSync("NOTEPAD_SYNC", { text: "", meta: { by: editorName, at: now } });
       toast.success("Shared notepad cleared");
     }
   };
@@ -240,6 +243,7 @@ export function NotesPage() {
       setSavedNotes(updated);
       localStorage.setItem(NOTES_LIST_KEY, JSON.stringify(updated));
       window.dispatchEvent(new Event("duomate_notes_updated"));
+      broadcastCloudSync("NOTES_LIST_SYNC", updated);
       toast.success("Note updated!");
     } else {
       // Create new
@@ -257,6 +261,7 @@ export function NotesPage() {
       setSavedNotes(updated);
       localStorage.setItem(NOTES_LIST_KEY, JSON.stringify(updated));
       window.dispatchEvent(new Event("duomate_notes_updated"));
+      broadcastCloudSync("NOTES_LIST_SYNC", updated);
       toast.success("Note saved and shared with your partner!");
     }
 
@@ -270,6 +275,7 @@ export function NotesPage() {
     setSavedNotes(updated);
     localStorage.setItem(NOTES_LIST_KEY, JSON.stringify(updated));
     window.dispatchEvent(new Event("duomate_notes_updated"));
+    broadcastCloudSync("NOTES_LIST_SYNC", updated);
     setSelectedNote(null);
     toast.success("Note deleted");
   };

@@ -34,6 +34,7 @@ import {
 } from "date-fns";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { broadcastCloudSync } from "@/lib/cloudSync";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -159,6 +160,7 @@ export function CalendarPage() {
     setEvents(updated);
     localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     window.dispatchEvent(new Event("duomate_calendar_updated"));
+    broadcastCloudSync("CALENDAR_SYNC", updated);
   };
 
   // Month navigation

@@ -13,6 +13,7 @@ import {
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useAuth } from "@/contexts/AuthContext";
+import { broadcastCloudSync } from "@/lib/cloudSync";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,12 +37,13 @@ export function ChecklistPage() {
   const [activeTab, setActiveTab] = useState<"mine" | "partner">("mine");
 
   const todayDisplay = format(new Date(), "EEEE, MMMM d, yyyy");
-  const myKey = `duomate_checklist_${profile?.username || "me"}`;
-  const partnerKey = `duomate_checklist_${partnerProfile?.username || "partner"}`;
+  const username = profile?.username || "aadhavan";
+  const myKey = `duomate_checklist_${username}`;
+  const partnerKey = `duomate_checklist_${partnerProfile?.username || "narmatha"}`;
 
   useEffect(() => {
     loadChecklists();
-  }, [profile?.username, partnerProfile?.username]);
+  }, [username, partnerProfile?.username]);
 
   const loadChecklists = () => {
     // Load mine
@@ -72,6 +74,8 @@ export function ChecklistPage() {
   const saveMyItems = (updated: SimpleChecklistItem[]) => {
     setMyItems(updated);
     localStorage.setItem(myKey, JSON.stringify(updated));
+    window.dispatchEvent(new Event("duomate_checklist_updated"));
+    broadcastCloudSync("CHECKLIST_SYNC", { user: username, items: updated });
   };
 
   const handleAddItem = (e: React.FormEvent) => {

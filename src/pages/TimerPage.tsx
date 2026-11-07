@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
+import { broadcastCloudSync } from "@/lib/cloudSync";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,6 +75,8 @@ export function TimerPage() {
   const saveSessions = (updated: StudyRecord[]) => {
     setSessions(updated);
     localStorage.setItem("duomate_study_sessions", JSON.stringify(updated));
+    window.dispatchEvent(new Event("duomate_timer_updated"));
+    broadcastCloudSync("TIMER_SYNC", updated[0] || null);
   };
 
   // Timer Tick
